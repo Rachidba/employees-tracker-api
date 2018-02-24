@@ -1,0 +1,1 @@
+// app/models/bear.js
