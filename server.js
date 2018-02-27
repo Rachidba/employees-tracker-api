@@ -7,35 +7,127 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+var morgan = require('morgan');
 
 // Configure app to use bodyParser()
 // This will let us get the data from a POST
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
 
+var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
+var config = require('./config'); // get our config file
+
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://127.0.0.1:27017/trackerDB');
+mongoose.connect(config.database);
 
 var Employee = require('./app/models/employee');
 var Location = require('./app/models/location'); 
+var User     = require('./app/models/user')   
 
 var port = process.env.PORT || 8085; //set our port
+
+app.set('superSecret', config.secret); // secret variable
+
+// use morgan to log requests to the console
+app.use(morgan('dev'));
 
 // ROUTES FOR OUR API
 // ================================================================================
 
 var router = express.Router();  // get instance of express router
 
-// Middleware to use for all requests
-router.use(function(req, res, next) {
-    // do logging
-    console.log('Somthing is happening.');
-    next(); // Make sure we go to the next and don't stop here
+// basic route
+router.get('/', function(req, res) {
+    res.json({message: 'Welcom to our API!'});
 });
 
-router.get('/', function(req, res) {
-    res.json({message: 'Welcom to our API:'});
+// route to authenticate a user (POST http://localhost:8085/api/authenticate)
+router.post('/authenticate', function(req, res) {
+    // find the user
+    User.findOne({
+        name: req.body.name
+    }, function(err, user) {
+  
+        if (err) throw err;
+  
+        if (!user) {
+            res.json({ success: false, message: 'Authentication failed. User not found.' });
+        } else if (user) {
+  
+        // check if password matches
+        if (user.password != req.body.password) {
+            res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+        } else {
+  
+            // if user is found and password is right
+            // create a token with only our given payload
+            // we don't want to pass in the entire user since that has the password
+            const payload = {
+                admin: user.admin 
+            };
+            var token = jwt.sign(payload, app.get('superSecret'), {
+                expiresIn: '1440m'  // expires in 24 hours
+            });
+  
+            // return the information including token as JSON
+            res.json({
+                success: true,
+                message: 'Enjoy your token!',
+                token: token
+            });
+        }   
+      } 
+    });
 });
+// route middleware to verify a token
+router.use(function(req, res, next) {
+    // check header or url parameters or post parameters for token
+    var token = req.body.token || req.query.token || req.headers['x-access-token'];
+    console.log("Hello1");
+    // decode token
+    if (token) {
+        console.log("Hello2");
+        // verifies secret and checks exp
+        jwt.verify(token, app.get('superSecret'), function(err, decoded) {      
+            if (err) {
+                return res.json({ success: false, message: 'Failed to authenticate token.' });    
+            } else {
+                // if everything is good, save to request for use in other routes
+                req.decoded = decoded;    
+                next();
+            }
+        });
+
+    } else {
+        console.log("Hello 3");
+        // if there is no token
+        // return an error
+        return res.status(403).send({ 
+            success: false, 
+            message: 'No token provided.' 
+        });
+
+    }
+});
+
+
+// route that will create a user 
+router.get('/setup', function(req, res) {
+    // Create a sample user
+    var admin = new User({
+        name: 'admin',
+        password: 'password',
+        admin: true
+    }); 
+
+    // Save the sample user
+    admin.save(function(err) {
+        if (err) throw err;
+
+        res.json({ success: true });
+    });
+});
+
 
 // on routes that end in /employees
 // -------------------------------------------------------------------------
