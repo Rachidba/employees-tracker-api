@@ -79,6 +79,25 @@ router.post('/authenticate', function(req, res) {
       } 
     });
 });
+
+
+// route that will create a user 
+router.get('/setup', function(req, res) {
+    // Create a sample user
+    var admin = new User({
+        name: 'admin',
+        password: 'password',
+        admin: true
+    }); 
+
+    // Save the sample user
+    admin.save(function(err) {
+        if (err) throw err;
+
+        res.json({ success: true });
+    });
+});
+
 // route middleware to verify a token
 router.use(function(req, res, next) {
     // check header or url parameters or post parameters for token
@@ -110,23 +129,6 @@ router.use(function(req, res, next) {
     }
 });
 
-
-// route that will create a user 
-router.get('/setup', function(req, res) {
-    // Create a sample user
-    var admin = new User({
-        name: 'admin',
-        password: 'password',
-        admin: true
-    }); 
-
-    // Save the sample user
-    admin.save(function(err) {
-        if (err) throw err;
-
-        res.json({ success: true });
-    });
-});
 
 
 // on routes that end in /employees
