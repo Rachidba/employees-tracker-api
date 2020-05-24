@@ -102,10 +102,8 @@ router.get('/setup', function(req, res) {
 router.use(function(req, res, next) {
     // check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
-    console.log("Hello1");
     // decode token
     if (token) {
-        console.log("Hello2");
         // verifies secret and checks exp
         jwt.verify(token, app.get('superSecret'), function(err, decoded) {      
             if (err) {
@@ -118,7 +116,6 @@ router.use(function(req, res, next) {
         });
 
     } else {
-        console.log("Hello 3");
         // if there is no token
         // return an error
         return res.status(403).send({ 
