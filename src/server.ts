@@ -15,14 +15,14 @@ app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
 
 var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
-var config = require('./config'); // get our config file
+var config = require('../config'); // get our config file
 
 var mongoose = require('mongoose');
 mongoose.connect(config.database);
 
-var Employee = require('./app/models/employee');
-var Location = require('./app/models/location'); 
-var User     = require('./app/models/user')   
+var Employee = require('./models/employee');
+var Location = require('./models/location'); 
+var User     = require('./models/user')   
 
 var port = process.env.PORT || 8085; //set our port
 
