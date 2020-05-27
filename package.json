@@ -1,11 +1,28 @@
 {
     "name": "node-api",
-    "main": "server.js",
+    "main": "./src/server.js",
+    "scripts": {
+        "start": "npm run dev",
+        "test": "jest",
+        "build": "tsc",
+        "lint": "eslint . & echo 'lint complete'",
+        "dev": "ts-node-dev --respawn --transpileOnly ./src/server.ts",
+        "prod": "tsc && node ./built/src/server.js",
+        "debug": "tsc && node --inspect ./built/src/server.js"
+    },
     "dependencies": {
         "body-parser": "^1.19.0",
         "express": "^4.17.1",
         "jsonwebtoken": "^8.1.1",
         "mongoose": "^5.9.15",
         "morgan": "^1.10.0"
+    },
+    "devDependencies": {
+        "@typescript-eslint/eslint-plugin": "^3.0.1",
+        "@typescript-eslint/parser": "^3.0.1",
+        "eslint": "^7.1.0",
+        "eslint-config-airbnb-typescript": "^7.2.1",
+        "ts-node": "^8.10.1",
+        "ts-node-dev": "^1.0.0-pre.44"
     }
 }
