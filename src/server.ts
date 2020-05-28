@@ -18,7 +18,8 @@ import { Employee } from './models/employee';
 import { Location } from './models/location';
 import { User  } from './models/user'; 
 
-import { EmployeeController } from './controllers/employees';
+import { EmployeeController } from './controllers/employeeController';
+import { LocationController } from './controllers/locationController';
 
 const port = process.env.PORT || 8085;
 
@@ -136,29 +137,11 @@ router.route('/employees/:employeeId')
 
 // on routes that end in /locations
 // -------------------------------------------------------------------------------------
-router.route('/locations')
-    .post(function(req, res) {
-        const location = new Location();
-        location.employeeId = req.body.fname;
-        location.zone = req.body.zone;
-        location.time = req.body.time;
+const locationController = new LocationController();
 
-        // Save location and check for errors
-        location.save(function(err) {
-            if (err) {
-                res.send(err);
-            } 
-            res.json({message: 'Location created !'});
-        })
-    })
-    // Get all locations
-    .get(function(req, res) {
-        Location.find(function(err, locations) {
-            if (err)
-                res.send(err);
-            res.json(locations);
-        });
-    });
+router.route('/locations')
+    .post(locationController.createLocation)
+    .get(locationController.getLocations);
 
 // REGISTER OUR ROUTES
 // all of our routes will be prefixed with /api

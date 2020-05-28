@@ -12,7 +12,7 @@ const LocationSchema: Schema = new Schema({
     time: {
         type: Date,
         default: Date.now
-    },
+    }
 });
 
 export interface ILocation extends Document {
