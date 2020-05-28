@@ -14,8 +14,6 @@ import config from '../config';
 import mongoose from 'mongoose';
 mongoose.connect(config.database);
 
-import { Employee } from './models/employee';
-import { Location } from './models/location';
 import { User  } from './models/user'; 
 
 import { EmployeeController } from './controllers/employeeController';
