@@ -3,9 +3,9 @@ import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import config from '../config';
 import mongoose from 'mongoose';
-import { AuthController } from './controllers/authController';
 import { EmployeeRoutes } from './routes/employeeRoutes';
 import { LocationRoutes } from './routes/locationRoutes';
+import { AuthRoutes } from './routes/authRoutes';
 
 class Server {
     private app: express.Application;
@@ -25,13 +25,9 @@ class Server {
     }
 
     private setRoutes(): void {
-        const router = express.Router();
-        const authController = new AuthController();
-        router.get('/setup', authController.setup);
-        router.post('/authenticate', authController.authenticateJWT);
+        this.app.use('/api/auth', new AuthRoutes().router);
         this.app.use("/api/employees", new EmployeeRoutes().router);
         this.app.use("/api/locations", new LocationRoutes().router);
-        this.app.use('/api', router);
     }
 
     private connectWithDb(): void {
