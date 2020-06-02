@@ -12,7 +12,6 @@ import config from '../config';
 import mongoose from 'mongoose';
 mongoose.connect(config.database);
 
-import { LocationController } from './controllers/locationController';
 import { AuthController } from './controllers/authController';
 import { EmployeeRoutes } from './routes/employeeRoutes';
 import { LocationRoutes } from './routes/locationRoutes';
@@ -34,8 +33,6 @@ router.get('/', function(req, res) {
 const authController = new AuthController();
 router.get('/setup', authController.setup);
 router.post('/authenticate', authController.authenticateJWT);
-
-router.use(authController.authorizeJWT);
 
 app.use("/api/employees", new EmployeeRoutes().router);
 
