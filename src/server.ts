@@ -1,46 +1,50 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
-
-const app = express();
-
-app.use(bodyParser.urlencoded({ extended: true}));
-app.use(bodyParser.json());
-
 import config from '../config';
-
 import mongoose from 'mongoose';
-mongoose.connect(config.database);
-
 import { AuthController } from './controllers/authController';
 import { EmployeeRoutes } from './routes/employeeRoutes';
 import { LocationRoutes } from './routes/locationRoutes';
 
-const port = process.env.PORT || 8085;
+class Server {
+    private app: express.Application;
 
-app.set('superSecret', config.secret);
+    constructor() {
+        this.app = express();
+        this.configure();
+        this.setRoutes();
+        this.connectWithDb();
+    }
 
-app.use(morgan('dev'));
+    private configure(): void {
+        this.app.set("port", process.env.PORT || 8085);
+        this.app.use(bodyParser.urlencoded({ extended: true}));
+        this.app.use(bodyParser.json());
+        this.app.use(morgan('dev'));
+    }
 
-// ROUTES FOR OUR API
-// ================================================================================
-const router = express.Router();
+    private setRoutes(): void {
+        const router = express.Router();
+        const authController = new AuthController();
+        router.get('/setup', authController.setup);
+        router.post('/authenticate', authController.authenticateJWT);
+        this.app.use("/api/employees", new EmployeeRoutes().router);
+        this.app.use("/api/locations", new LocationRoutes().router);
+        this.app.use('/api', router);
+    }
 
-router.get('/', function(req, res) {
-    res.json({message: 'Welcom to our API!'});
-});
+    private connectWithDb(): void {
+        mongoose.connect(config.database);
+    } 
 
-const authController = new AuthController();
-router.get('/setup', authController.setup);
-router.post('/authenticate', authController.authenticateJWT);
+    public start(): void {
+        this.app.listen(this.app.get("port"), () => {
+            console.log("  API is running at http://localhost:%d", this.app.get("port"));
+        });
+    }
+}
 
-app.use("/api/employees", new EmployeeRoutes().router);
+const server = new Server();
 
-app.use("/api/locations", new LocationRoutes().router);
-
-app.use('/api', router);
-
-// START THE SERVER
-// ============================================================================
-app.listen(port)
-console.log('Magic happens on port ' + port);
+server.start();

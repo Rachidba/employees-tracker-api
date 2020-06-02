@@ -13,7 +13,7 @@ export class EmployeeRoutes {
         this.routes();
     }
 
-    routes() {
+    private routes() {
         this.router.get("/", this.authController.authorizeJWT, this.employeeController.getEmployees);
         this.router.post("/", this.authController.authorizeJWT, this.employeeController.createEmployee);
         this.router.get("/:employeeId", this.authController.authorizeJWT, this.employeeController.getEmployee);
