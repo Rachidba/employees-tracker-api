@@ -7,8 +7,6 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
 
-import jwt from 'jsonwebtoken';
-
 import config from '../config';
 
 import mongoose from 'mongoose';
@@ -18,6 +16,7 @@ mongoose.connect(config.database);
 import { EmployeeController } from './controllers/employeeController';
 import { LocationController } from './controllers/locationController';
 import { AuthController } from './controllers/authController';
+import { EmployeeRoutes } from './routes/employeeRoutes';
 
 const port = process.env.PORT || 8085;
 
@@ -39,16 +38,17 @@ router.post('/authenticate', authController.authenticateJWT);
 
 router.use(authController.authorizeJWT);
 
-const employeeController = new EmployeeController();
+// const employeeController = new EmployeeController();
 
-router.route('/employees')
-    .post(employeeController.createEmployee)
-    .get(employeeController.getEmployees);
+// router.route('/employees')
+//     .post(employeeController.createEmployee)
+//     .get(employeeController.getEmployees);
 
-router.route('/employees/:employeeId')
-    .get(employeeController.getEmployee)
-    .put(employeeController.updateEmployee)
-    .delete(employeeController.deleteEmployee);
+// router.route('/employees/:employeeId')
+//     .get(employeeController.getEmployee)
+//     .put(employeeController.updateEmployee)
+//     .delete(employeeController.deleteEmployee);
+app.use("/api/employees", new EmployeeRoutes().router);
 
 const locationController = new LocationController();
 router.route('/locations')
