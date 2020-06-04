@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import { EmployeeRoutes } from './routes/employeeRoutes';
 import { LocationRoutes } from './routes/locationRoutes';
 import { AuthRoutes } from './routes/authRoutes';
+import { AreaRoutes } from './routes/areaRoutes';
 
 class Server {
     private app: express.Application;
@@ -20,7 +21,7 @@ class Server {
     private configure(): void {
         this.app.set("port", process.env.PORT || 8085);
         this.app.use(bodyParser.urlencoded({ extended: true}));
-        this.app.use(bodyParser.json());
+        this.app.use(bodyParser.json()); 
         this.app.use(morgan('dev'));
     }
 
@@ -28,6 +29,7 @@ class Server {
         this.app.use('/api/auth', new AuthRoutes().router);
         this.app.use("/api/employees", new EmployeeRoutes().router);
         this.app.use("/api/locations", new LocationRoutes().router);
+        this.app.use("/api/areas", new AreaRoutes().router);
     }
 
     private connectWithDb(): void {
