@@ -4,7 +4,7 @@ import morgan from 'morgan';
 import config from '../config';
 import mongoose from 'mongoose';
 import { EmployeeRoutes } from './routes/employeeRoutes';
-import { LocationRoutes } from './routes/locationRoutes';
+import { MovementRoutes } from './routes/movementRoutes';
 import { AuthRoutes } from './routes/authRoutes';
 import { AreaRoutes } from './routes/areaRoutes';
 
@@ -28,7 +28,7 @@ class Server {
     private setRoutes(): void {
         this.app.use('/api/auth', new AuthRoutes().router);
         this.app.use("/api/employees", new EmployeeRoutes().router);
-        this.app.use("/api/locations", new LocationRoutes().router);
+        this.app.use("/api/movements", new MovementRoutes().router);
         this.app.use("/api/areas", new AreaRoutes().router);
     }
 
